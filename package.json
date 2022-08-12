@@ -10,5 +10,8 @@
   "license": "MIT",
   "devDependencies": {
     "vitest": "^0.21.1"
+  },
+  "dependencies": {
+    "redis": "^4.2.0"
   }
 }
