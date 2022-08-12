@@ -1,0 +1,14 @@
+{
+  "name": "redis-mud",
+  "version": "0.0.1",
+  "description": "A fun little multi-user dungeon, backed by Redis Stack.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --dir ./spec"
+  },
+  "author": "Guy Royse <guy@guyroyse.com> (http://guyroyse.com/)",
+  "license": "MIT",
+  "devDependencies": {
+    "vitest": "^0.21.1"
+  }
+}
