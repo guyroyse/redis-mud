@@ -1,9 +1,17 @@
 import { Session } from '$lib/session.js'
-import { afterEach } from 'vitest'
+import { redisClient } from '$lib/redis.js'
 
 describe("Session", () => {
 
   let session, otherSession
+
+  beforeAll(async () => {
+    await Promise.all([
+      redisClient.json.set('user:mephalich', '$', { name: 'Mephalich'}),
+      redisClient.json.set('user:conrad', '$', { name: 'Conrad Taylor'}),
+      redisClient.json.set('room:00000000000000000000000001', '$', { name: 'The Hub'})
+    ])
+  })
 
   beforeEach(async () => {
     session = new Session()
@@ -16,6 +24,10 @@ describe("Session", () => {
   afterEach(() => {
     session.destroy()
     otherSession.destroy()
+  })
+
+  afterAll(async () => {
+    return redisClient.flushAll()
   })
 
   it("recevies a chat message from ourselves", async () => {
@@ -39,5 +51,4 @@ describe("Session", () => {
       otherSession.sendCommand('bar')
     })
   })
-
 })
