@@ -1,5 +1,6 @@
 import { Session } from '$lib/session.js'
 import { redisClient } from '$lib/redis.js'
+import { afterAll } from 'vitest'
 
 describe("Session", () => {
 
@@ -7,12 +8,21 @@ describe("Session", () => {
 
   beforeAll(async () => {
     await Promise.all([
-      redisClient.json.set('user:mephalich', '$', { name: 'Mephalich'}),
-      redisClient.json.set('user:conrad', '$', { name: 'Conrad'}),
-      redisClient.json.set('user:leeroy', '$', { name: 'Leeroy'}),
-      redisClient.json.set('room:00000000000000000000000001', '$', {
+      redisClient.json.set('User:mephalich', '$', { name: 'Mephalich'}),
+      redisClient.json.set('User:conrad', '$', { name: 'Conrad'}),
+      redisClient.json.set('User:leeroy', '$', { name: 'Leeroy'}),
+      redisClient.json.set('Room:00000000000000000000000001', '$', {
         name: 'The Hub',
         description: 'This large, open, circular room has numerous doors. At the center, there is a large, oak reception desk.' })
+    ])
+  })
+
+  afterAll(async () => {
+    await redisClient.unlink([
+      'User:mephalich',
+      'User:conrad',
+      'User:leeroy',
+      'Room:00000000000000000000000001'
     ])
   })
 
@@ -31,10 +41,6 @@ describe("Session", () => {
     mephalichSession.destroy()
     conradSession.destroy()
     leeroySession.destroy()
-  })
-
-  afterAll(async () => {
-    return redisClient.flushAll()
   })
 
   it("recevies a chat message from ourselves", async () => {
