@@ -31,7 +31,7 @@ describe("Room", () => {
         await room.description("A deep, dark pit stares back at you.")
       })
       it("has the expected name", async () => expect(room.name()).resolves.toBe("The Pit"))
-      it("has the expected name", async () => expect(room.description()).resolves.toBe("A deep, dark pit stares back at you."))
+      it("has the expected description", async () => expect(room.description()).resolves.toBe("A deep, dark pit stares back at you."))
     })
   })
 })
