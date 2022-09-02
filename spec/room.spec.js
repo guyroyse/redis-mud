@@ -1,6 +1,6 @@
 import { Room } from '$lib/room.js'
 import { redisClient } from '$lib/redis.js'
-import { afterEach, describe } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 const ROOM_NAME = "The Pit"
 const ROOM_DESCRIPTION = "A deep, dark pit stares back at you."
@@ -59,6 +59,14 @@ describe("Room", () => {
           it("has nothing in Redis", async () => {
             const exists = await redisClient.exists(`Room:${fetchedRoom.id}`)
             expect(exists).toBe(0)
+          })
+
+          it("complains that the room was destroyed when checking the name", async () => {
+            expect(async () => await fetchedRoom.name()).rejects.toThrowError("Room doesn't exist")
+          })
+
+          it("complains that the room was destroyed when checking the description", async () => {
+            expect(async () => await fetchedRoom.description()).rejects.toThrowError("Room doesn't exist")
           })
         })
       })
