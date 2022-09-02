@@ -7,7 +7,7 @@ const ROOM_DESCRIPTION = "A deep, dark pit stares back at you."
 
 describe("Room", () => {
 
-  let createdRoom, fetchedRoom
+  let createdRoom, fetchedRoom, exists
 
   describe("when created", () => {
 
@@ -22,6 +22,8 @@ describe("Room", () => {
       const roomJson = await redisClient.json.get(`Room:${createdRoom.id}`, '$')
       expect(roomJson).toEqual({ id: createdRoom.id })
     })
+
+    it("exists", async () => expect(Room.exists(createdRoom.id)).resolves.toBe(true))
 
     describe("when the properties are updated", () => {
 
@@ -44,7 +46,7 @@ describe("Room", () => {
 
       describe("when fetched", () => {
 
-        beforeEach(() => { fetchedRoom = Room.fetch(createdRoom.id) })
+        beforeEach(async () => { fetchedRoom = await Room.fetch(createdRoom.id) })
 
         it("has the expected id", () => expect(fetchedRoom.id).toBe(createdRoom.id))
         it("has the expected name", async () => expect(fetchedRoom.name()).resolves.toBe(ROOM_NAME))
@@ -65,11 +67,23 @@ describe("Room", () => {
 
         beforeEach(async () => { await Room.destroy(createdRoom.id) })
 
+        it("no longer exists", async () => expect(Room.exists(createdRoom.id)).resolves.toBe(false))
+
         it("has nothing in Redis", async () => {
           const exists = await redisClient.exists(`Room:${createdRoom.id}`)
           expect(exists).toBe(0)
         })
       })
     })
+  })
+
+  describe("when fetching a missing room", () => {
+    beforeEach(async () => { fetchedRoom = await Room.fetch('BOGUS_ID') })
+    it("returns null", () => expect(fetchedRoom).toBeNull())
+  })
+
+  describe("when checking the existence of a missing room", () => {
+    beforeEach(async () => { exists = await Room.exists('BOGUS_ID') })
+    it("returns false", () => expect(exists).toBe(false))
   })
 })
