@@ -16,7 +16,7 @@ describe("Room", () => {
 
     it("has a valid id", () => expect(createdRoom.id).toMatch(/^[0-9A-HJKMNP-TV-Z]{26}$/))
     it("has an empty name", async () => expect(createdRoom.name()).resolves.toBeNull())
-    it("has an empty description", async () => expect(await createdRoom.description()).toBeNull())
+    it("has an empty description", async () => expect(createdRoom.description()).resolves.toBeNull())
 
     it("creates an empty document in Redis", async () => {
       const roomJson = await redisClient.json.get(`Room:${createdRoom.id}`, '$')
@@ -68,6 +68,14 @@ describe("Room", () => {
           it("complains that the room was destroyed when checking the description", async () => {
             expect(async () => await fetchedRoom.description()).rejects.toThrowError("Room doesn't exist")
           })
+
+          it("complains that the room was destroyed when setting the name", async () => {
+            expect(async () => await fetchedRoom.name(ROOM_NAME)).rejects.toThrowError("Room doesn't exist")
+          })
+
+          it("complains that the room was destroyed when setting the description", async () => {
+            expect(async () => await fetchedRoom.description(ROOM_DESCRIPTION)).rejects.toThrowError("Room doesn't exist")
+          })
         })
       })
 
@@ -80,6 +88,26 @@ describe("Room", () => {
         it("has nothing in Redis", async () => {
           const exists = await redisClient.exists(`Room:${createdRoom.id}`)
           expect(exists).toBe(0)
+        })
+      })
+    })
+
+    describe("when the properties are updated to null", () => {
+
+      beforeEach(async () => {
+        await createdRoom.name(null)
+        await createdRoom.description(null)
+      })
+
+      it("has a null name", async () => expect(createdRoom.name()).resolves.toBeNull())
+      it("has a null description", async () => expect(createdRoom.description()).resolves.toBeNull())
+
+      it("has the expected document in Redis", async () => {
+        const roomJson = await redisClient.json.get(`Room:${createdRoom.id}`, '$')
+        expect(roomJson).toEqual({
+          id: createdRoom.id,
+          name: null,
+          description: null
         })
       })
     })
