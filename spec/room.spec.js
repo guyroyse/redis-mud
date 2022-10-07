@@ -1,6 +1,5 @@
 import { Room } from '$lib/room.js'
 import { redisClient } from '$lib/redis.js'
-import { afterEach, describe, expect, it } from 'vitest'
 
 const ROOM_NAME = "The Pit"
 const ROOM_DESCRIPTION = "A deep, dark pit stares back at you."
